@@ -8,6 +8,7 @@ const photoRoutes = require('./routes/photoRoutes');
 const authRoutes = require('./routes/authRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const contactRoutes = require("./routes/contactRoutes");
+const storyRoutes = require('./routes/storyRoutes');
 
 
 
@@ -38,6 +39,7 @@ app.use('/api/photos', photoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/comments', commentRoutes);
 app.use("/api", contactRoutes);
+app.use('/api/stories', storyRoutes);
 
 
 

@@ -67,7 +67,7 @@ router.post('/register', async (req, res) => {
       C'est déjà l'été, et le bitume chaud vous brûle, avant la fin des cours,
       Et puis l'hiver est là, et de la lumière feutrée s'échappe des fenêtres intimes par cette nuit glacée,
       ,
-      Bienvenue.sur Liminal,
+      Bienvenue sur Liminal,
     `;
 
     // Envoi de l'email de bienvenue
@@ -240,6 +240,7 @@ router.get('/me', authenticate, async (req, res) => {
       username: user.username
       // ...
     });
+   
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Erreur lors de la récupération du profil.' });
