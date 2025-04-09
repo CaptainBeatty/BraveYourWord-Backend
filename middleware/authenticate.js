@@ -14,8 +14,9 @@ const authenticate = (req, res, next) => {
 
   try {
     // Vérifier et décoder le token
-    const decoded = jwt.verify(token, 'secret_key'); // Remplacez 'secret_key' par votre clé secrète
-    req.user = decoded; // Stocker les informations de l'utilisateur dans req.user
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret_key');
+    req.user = decoded;
+    req.user._id = decoded.id;
     next(); // Continuer avec la requête
   } catch (err) {
     console.error('Erreur de validation du token:', err);

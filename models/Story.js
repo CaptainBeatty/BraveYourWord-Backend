@@ -16,9 +16,9 @@ const storySchema = new Schema({
     ref: 'User',
     required: true
   },
-  createdAt: {
+  publicationDate: {
     type: Date,
-    default: Date.now
+    default: Date.now // si vous voulez qu’elle soit définie automatiquement
   },
   images: [{
     type: String

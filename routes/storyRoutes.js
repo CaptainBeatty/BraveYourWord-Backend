@@ -10,7 +10,8 @@ router.post('/', authenticate, async (req, res) => {
     const newStory = new Story({
       title: req.body.title,
       content: req.body.content,
-      author: req.user._id
+      author: req.user.id,
+      publicationDate: req.body.publicationDate
     });
     const savedStory = await newStory.save();
     res.status(201).json(savedStory);
