@@ -7,8 +7,15 @@ const storySchema = new Schema({
     type: String,
     required: true
   },
+  description: {
+    type: String
+  },
   content: {
+    type: String  // Nouveau champ pour le texte complet (Ecriture)
+  },
+  genre: {
     type: String,
+    enum: ['roman', 'nouvelle', 'recueil'],
     required: true
   },
   author: {
@@ -18,7 +25,7 @@ const storySchema = new Schema({
   },
   publicationDate: {
     type: Date,
-    default: Date.now // si vous voulez qu’elle soit définie automatiquement
+    default: Date.now
   },
   images: [{
     type: String

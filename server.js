@@ -4,25 +4,16 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 
-const photoRoutes = require('./routes/photoRoutes');
 const authRoutes = require('./routes/authRoutes');
 const commentRoutes = require('./routes/commentRoutes');
 const contactRoutes = require("./routes/contactRoutes");
 const storyRoutes = require('./routes/storyRoutes');
-
-
-
-
+const nouvelleRoutes = require('./routes/nouvelleRoutes');
 
 dotenv.config();
 
 const app = express();
 
-console.log('Cloudinary Config:', {
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
 
 // Vérification des variables d'environnement essentielles
 if (!process.env.MONGO_URI || !process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
@@ -35,7 +26,6 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // Routes API
-app.use('/api/photos', photoRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/comments', commentRoutes);
 app.use("/api", contactRoutes);

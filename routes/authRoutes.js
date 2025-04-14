@@ -3,7 +3,6 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const User = require('../models/User');
-const Photo = require('../models/Photo');
 const Comment = require('../models/Comment');
 const authenticate = require('../middleware/authenticate'); // votre middleware
 require('dotenv').config(); // Charger les variables d'environnement

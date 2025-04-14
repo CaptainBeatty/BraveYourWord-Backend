@@ -5,11 +5,14 @@ const Story = require('../models/Story');
 const authenticate = require('../middleware/authenticate'); // Middleware d'authentification
 
 // Créer une story
+// Extrait de storyRoutes.js
+// Créer une story
 router.post('/', authenticate, async (req, res) => {
   try {
     const newStory = new Story({
       title: req.body.title,
-      content: req.body.content,
+      description: req.body.description, // nouvelle zone description
+      genre: req.body.genre,             // champ genre
       author: req.user.id,
       publicationDate: req.body.publicationDate
     });
@@ -19,6 +22,7 @@ router.post('/', authenticate, async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
 
 // Récupérer toutes les stories
 router.get('/', async (req, res) => {
@@ -44,11 +48,27 @@ router.get('/:id', async (req, res) => {
 });
 
 // Mettre à jour une story
+// storyRoutes.js (extrait)
 router.put('/:id', authenticate, async (req, res) => {
   try {
+    const updateData = {
+      title: req.body.title,
+      // Mise à jour des champs selon ce qui est envoyé dans la requête
+    };
+    // Si le champ content est fourni, on le met à jour
+    if (req.body.content !== undefined) {
+      updateData.content = req.body.content;
+    }
+    // Vous pouvez également permettre la mise à jour de description et publicationDate
+    if (req.body.description !== undefined) {
+      updateData.description = req.body.description;
+    }
+    if (req.body.publicationDate) {
+      updateData.publicationDate = req.body.publicationDate;
+    }
     const updatedStory = await Story.findByIdAndUpdate(
       req.params.id,
-      { title: req.body.title, content: req.body.content },
+      updateData,
       { new: true }
     );
     if (!updatedStory) {
