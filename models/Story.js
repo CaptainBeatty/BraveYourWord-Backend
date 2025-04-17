@@ -11,7 +11,7 @@ const storySchema = new Schema({
     type: String
   },
   content: {
-    type: String  // Nouveau champ pour le texte complet (Ecriture)
+    type: String  // Texte complet (mode Ecriture)
   },
   genre: {
     type: String,
@@ -29,7 +29,12 @@ const storySchema = new Schema({
   },
   images: [{
     type: String
-  }]
+  }],
+  recueil: {
+    type: Schema.Types.ObjectId,
+    ref: 'Story'  // Référence à un recueil (un Story avec genre "recueil")
+  }
+  
 });
 
 module.exports = mongoose.model('Story', storySchema);

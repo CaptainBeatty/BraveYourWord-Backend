@@ -9,13 +9,23 @@ const authenticate = require('../middleware/authenticate'); // Middleware d'auth
 // Créer une story
 router.post('/', authenticate, async (req, res) => {
   try {
+    const { title, description, content, genre, recueil, publicationDate } = req.body;
+
+    // Validation simple
+    if (genre === 'nouvelle' && !recueil) {
+      return res.status(400).json({ error: 'recueil obligatoire pour une nouvelle' });
+    }
+
     const newStory = new Story({
-      title: req.body.title,
-      description: req.body.description, // nouvelle zone description
-      genre: req.body.genre,             // champ genre
+      title,
+      description,
+      content,
+      genre,
+      recueil,            // <-- on stocke bien la référence
       author: req.user.id,
-      publicationDate: req.body.publicationDate
+      publicationDate
     });
+
     const savedStory = await newStory.save();
     res.status(201).json(savedStory);
   } catch (err) {
@@ -35,9 +45,14 @@ router.get('/', async (req, res) => {
 });
 
 // Récupérer une story par ID
+// storyRoutes.js, dans router.get('/:id', ...)
 router.get('/:id', async (req, res) => {
   try {
-    const story = await Story.findById(req.params.id).populate('author', 'username');
+    // On peuple le champ recueil (et author) avec seulement le titre (et username)
+    const story = await Story.findById(req.params.id)
+      .populate('author', 'username')
+      .populate('recueil', 'title'); // <-- Ajout d’un populate sur recueil
+
     if (!story) {
       return res.status(404).json({ error: 'Story not found' });
     }
@@ -47,24 +62,28 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+
 // Mettre à jour une story
+// storyRoutes.js (extrait)
 // storyRoutes.js (extrait)
 router.put('/:id', authenticate, async (req, res) => {
   try {
     const updateData = {
       title: req.body.title,
-      // Mise à jour des champs selon ce qui est envoyé dans la requête
+      // Si la requête contient content, description et/ou publicationDate, on les met à jour :
     };
-    // Si le champ content est fourni, on le met à jour
     if (req.body.content !== undefined) {
       updateData.content = req.body.content;
     }
-    // Vous pouvez également permettre la mise à jour de description et publicationDate
     if (req.body.description !== undefined) {
       updateData.description = req.body.description;
     }
     if (req.body.publicationDate) {
       updateData.publicationDate = req.body.publicationDate;
+    }
+    // Ajout de la mise à jour du champ recueil, si présent
+    if (req.body.recueil !== undefined) {
+      updateData.recueil = req.body.recueil;
     }
     const updatedStory = await Story.findByIdAndUpdate(
       req.params.id,
@@ -80,17 +99,33 @@ router.put('/:id', authenticate, async (req, res) => {
   }
 });
 
+
 // Supprimer une story
 router.delete('/:id', authenticate, async (req, res) => {
   try {
-    const deletedStory = await Story.findByIdAndDelete(req.params.id);
-    if (!deletedStory) {
-      return res.status(404).json({ error: 'Story not found' });
+    const recueil = await Story.findById(req.params.id);
+    if (!recueil) return res.status(404).json({ error: 'Story not found' });
+
+    // Vérifier l’auteur ici si besoin…
+
+    if (recueil.genre === 'recueil') {
+      await Story.deleteMany({ recueil: recueil._id });   // on supprime les nouvelles
     }
-    res.status(200).json({ message: 'Story deleted' });
+
+    await recueil.deleteOne();
+    res.status(200).json({ message: 'Recueil (et ses nouvelles) supprimé' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
+
+// DELETE /stories?recueil=<id>
+router.delete('/', authenticate, async (req, res) => {
+  if (!req.query.recueil) return res.status(400).json({ error: 'recueil id manquant' });
+  await Story.deleteMany({ recueil: req.query.recueil, genre: 'nouvelle' });
+  res.status(200).json({ message: 'Nouvelles du recueil supprimées' });
+});
+
+
 
 module.exports = router;
