@@ -126,6 +126,47 @@ router.delete('/', authenticate, async (req, res) => {
   res.status(200).json({ message: 'Nouvelles du recueil supprimées' });
 });
 
+// Toggle like/dislike générique
+async function toggleVote(action, req, res) {
+    try {
+      const doc = await Story.findById(req.params.id);
+      if (!doc) return res.status(404).json({ error: 'Introuvable.' });
+      const uid = req.user.id;
+      doc.likedBy    = doc.likedBy    || [];
+      doc.dislikedBy = doc.dislikedBy || [];
+      const liked    = doc.likedBy.includes(uid);
+      const disliked = doc.dislikedBy.includes(uid);
+      if (action === 'like') {
+        if (liked) {
+          doc.likes--; doc.likedBy.pull(uid);
+        } else {
+          if (disliked) { doc.dislikes--; doc.dislikedBy.pull(uid); }
+          doc.likes++; doc.likedBy.push(uid);
+        }
+      } else {
+        if (disliked) {
+          doc.dislikes--; doc.dislikedBy.pull(uid);
+        } else {
+          if (liked) { doc.likes--; doc.likedBy.pull(uid); }
+          doc.dislikes++; doc.dislikedBy.push(uid);
+        }
+      }
+      await doc.save();
+      res.status(200).json({
+        message: action==='like' ? (liked?'Like annulé':'Like ajouté') : (disliked?'Dislike annulé':'Dislike ajouté'),
+        likes: doc.likes,
+        dislikes: doc.dislikes
+      });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Erreur serveur.' });
+    }
+  }
+  
+  // Routes protectées
+  router.post('/:id/like',    authenticate, (req, res) => toggleVote('like',    req, res));
+  router.post('/:id/dislike', authenticate, (req, res) => toggleVote('dislike', req, res));
+
 
 
 module.exports = router;

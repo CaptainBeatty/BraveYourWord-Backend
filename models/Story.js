@@ -33,8 +33,19 @@ const storySchema = new Schema({
   recueil: {
     type: Schema.Types.ObjectId,
     ref: 'Story'  // Référence à un recueil (un Story avec genre "recueil")
-  }
-  
+  },
+  likes: { 
+    type: Number, default: 0 
+  },
+  dislikes: { 
+    type: Number, default: 0 
+  },
+  likedBy: [{ 
+    type: Schema.Types.ObjectId, ref: 'User' 
+  }],
+  dislikedBy: [{
+   type: Schema.Types.ObjectId, ref: 'User' 
+  }], 
 });
 
 module.exports = mongoose.model('Story', storySchema);

@@ -30,6 +30,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/comments', commentRoutes);
 app.use("/api", contactRoutes);
 app.use('/api/stories', storyRoutes);
+app.use('/api/nouvelles', nouvelleRoutes);
 
 
 
