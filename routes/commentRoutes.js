@@ -6,15 +6,15 @@ const router = express.Router();
 // **Route POST : Ajouter un commentaire ou une réponse**
 router.post('/', authenticate, async (req, res) => {
   try {
-    const { photoId, content, parentId } = req.body;
+    const { storyId, content, parentId } = req.body;
 
-    if (!photoId || !content) {
+    if (!storyId || !content) {
       return res.status(400).json({ error: 'Les champs "photoId" et "content" sont obligatoires.' });
     }
 
     // Création du commentaire ou de la réponse
     const newComment = new Comment({
-      photoId,
+      storyId,
       userId: req.user.id,
       content,
       parentId: parentId || null, // Null si pas de parent (commentaire principal)
@@ -31,9 +31,9 @@ router.post('/', authenticate, async (req, res) => {
 });
 
 // **Route GET : Récupérer les commentaires et leurs réponses**
-router.get('/:photoId', async (req, res) => {
+router.get('/:storyId', async (req, res) => {
   try {
-    const comments = await Comment.find({ photoId: req.params.photoId })
+    const comments = await Comment.find({ storyId: req.params.storyId })
       .populate('userId', 'username')
       .populate('parentId', 'userId content')
       .sort({ createdAt: -1 });
